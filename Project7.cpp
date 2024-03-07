@@ -161,7 +161,8 @@ const int MS_PER_CYCLE = 10000;		// 10000 milliseconds = 10 seconds
 // non-constant global variables:
 
 int		ActiveButton;			// current button that is down
-GLuint	AxesList;				// list to hold the axes
+GLuint	AxesList;			// list to hold the axes
+GLuint 	HorseList;
 int		AxesOn;					// != 0 means to draw the axes
 int		DebugOn;				// != 0 means to print debugging info
 bool	Freeze;
@@ -256,7 +257,7 @@ MulArray3(float factor, float a, float b, float c )
 //#include "osucone.cpp"
 //#include "osutorus.cpp"
 //#include "bmptotexture.cpp"
-//#include "loadobjfile.cpp"
+#include "loadobjfile.cpp"
 #include "keytime.cpp"
 #include "glslprogram.cpp"
 
@@ -379,7 +380,7 @@ Display( )
 
 	// set the eye position, look-at position, and up-vector:
 
-	gluLookAt( 0.f, 0.f, 3.f,     0.f, 0.f, 0.f,     0.f, 1.f, 0.f );
+	gluLookAt( 0.f, 2.f, 3.f,     0.f, 0.f, 0.f,     0.f, 1.f, 0.f );
 
 	// rotate the scene:
 
@@ -410,14 +411,11 @@ Display( )
 
 	// set the uniform variables that will change over time:
 
-	NowS0 = 0.5f;
-	NowT0 = 0.5f;
-	NowD  = 0.25f;
-	Pattern.SetUniformVariable( (char *)"uS0", NowS0 );
-	Pattern.SetUniformVariable( (char *)"uT0", NowT0 );
-	Pattern.SetUniformVariable( (char *)"uD" , NowD  );
+	float twist=0.5;
+	
 
-	glCallList( SphereList );
+	Pattern.SetUniformVariable( "uTwist", twist );
+	glCallList(HorseList);
 
 	Pattern.UnUse( );       // Pattern.Use(0);  also works
 
@@ -701,6 +699,15 @@ InitGraphics( )
 	// but, this sets us up nicely for doing animation
 
 	glutIdleFunc( Animate );
+
+	HorseList=glGenLists( 1 );
+	glNewList(HorseList,GL_COMPILE);
+	glPushMatrix();
+	glScalef(0.2,0.2,0.2);
+	glRotatef(-90,90,0,0);
+	LoadObjFile((char*)"Horse.obj");
+	glPopMatrix();
+	glEndList( );
 
 	// init the glew package (a window must be open to do this):
 

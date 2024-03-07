@@ -6,48 +6,25 @@ uniform float   uShininess;	 // specular exponent
 
 // square-equation uniform variables -- these should be set every time Display( ) is called:
 
-uniform float   uS0, uT0, uD;
-
-// in variables from the vertex shader and interpolated in the rasterizer:
-
-varying  vec3  vN;		   // normal vector
-varying  vec3  vL;		   // vector from point to light
-varying  vec3  vE;		   // vector from point to eye
-varying  vec2  vST;		   // (s,t) texture coordinates
-
+float uA=5.0; 
+float uP=0.25; 
+float uTol=0.0;
+varying float vX, vY;
+varying vec3 vColor;
+varying float vLightIntensity;
+const vec3 WHITE = vec3( 1., 1., 1. );
 
 void
 main( )
 {
-	float s = vST.s;
-	float t = vST.t;
+	float r = sqrt( vX*vX + vY*vY ); 
+	float rfrac = fract( uA*r );
 
-	// determine the color using the square-boundary equations:
+	
+	float f = fract( uA*vX );
+	float t = smoothstep( 0.5-uP-uTol, 0.5-uP+uTol, f ) - smoothstep( 0.5+uP-uTol, 0.5+uP+uTol, f ); 
+	vec3 rgb = vLightIntensity * mix( WHITE, vColor, t );
+	gl_FragColor = vec4( rgb, 1. );
 
-	vec3 myColor = uColor;
-	if( uS0-uD/2. <= s  &&  s <= uS0+uD/2.  &&  uT0-uD/2. <= t  &&  t <= uT0+uD/2. )
-	{
-		myColor = vec3( 1., 0., 0. );;
-	}
-
-	// apply the per-fragmewnt lighting to myColor:
-
-	vec3 Normal = normalize(vN);
-	vec3 Light  = normalize(vL);
-	vec3 Eye    = normalize(vE);
-
-	vec3 ambient = uKa * myColor;
-
-	float dd = max( dot(Normal,Light), 0. );       // only do diffuse if the light can see the point
-	vec3 diffuse = uKd * dd * myColor;
-
-	float ss = 0.;
-	if( dot(Normal,Light) > 0. )	      // only do specular if the light can see the point
-	{
-		vec3 ref = normalize(  reflect( -Light, Normal )  );
-		ss = pow( max( dot(Eye,ref),0. ), uShininess );
-	}
-	vec3 specular = uKs * ss * uSpecularColor;
-	gl_FragColor = vec4( ambient + diffuse + specular,  1. );
 }
 
