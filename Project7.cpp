@@ -174,7 +174,6 @@ float	Time;					// used for animation, this has a value between 0. and 1.
 int		Xmouse, Ymouse;			// mouse values
 float	Xrot, Yrot;				// rotation angles in degrees
 
-int		SphereList;
 
 
 // function prototypes:
@@ -771,13 +770,7 @@ InitLists( )
 
 	glutSetWindow( MainWindow );
 
-	// create the object:
-
-	SphereList = glGenLists( 1 );
-	glNewList( SphereList, GL_COMPILE );
-		OsuSphere( 1., 64, 64 );
-	glEndList( );
-
+	
 
 	// create the axes:
 
