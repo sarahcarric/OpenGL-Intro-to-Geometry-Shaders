@@ -9,7 +9,7 @@ uniform float   uShininess;	 // specular exponent
 float uA=5.0; 
 float uP=0.25; 
 float uTol=0.0;
-varying float vX, vY;
+varying float vX, vY,vZ;
 varying vec3 vColor;
 varying float vLightIntensity;
 const vec3 WHITE = vec3( 1., 1., 1. );
@@ -18,12 +18,10 @@ void
 main( )
 {
 	float r = sqrt( vX*vX + vY*vY ); 
-	float rfrac = fract( uA*r );
-
-	
+	float rfrac = fract( uA*r );	
 	float f = fract( uA*vX );
 	float t = smoothstep( 0.5-uP-uTol, 0.5-uP+uTol, f ) - smoothstep( 0.5+uP-uTol, 0.5+uP+uTol, f ); 
-	vec3 rgb = vLightIntensity * mix( WHITE, vColor, t );
+	vec3 rgb = vLightIntensity * mix( uColor,WHITE , t );
 	gl_FragColor = vec4( rgb, 1. );
 
 }

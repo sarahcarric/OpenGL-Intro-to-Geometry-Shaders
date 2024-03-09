@@ -260,6 +260,7 @@ MulArray3(float factor, float a, float b, float c )
 #include "loadobjfile.cpp"
 #include "keytime.cpp"
 #include "glslprogram.cpp"
+Keytimes NowTwist;
 
 float NowS0, NowT0, NowD;
 GLSLProgram Pattern;
@@ -380,7 +381,7 @@ Display( )
 
 	// set the eye position, look-at position, and up-vector:
 
-	gluLookAt( 0.f, 2.f, 3.f,     0.f, 0.f, 0.f,     0.f, 1.f, 0.f );
+	gluLookAt( 0.f, 5.f, 3.f,     0.f, 0.f, 0.f,     0.f, 3.f, 0.f );
 
 	// rotate the scene:
 
@@ -404,17 +405,19 @@ Display( )
 	// since we are using glScalef( ), be sure the normals get unitized:
 
 	glEnable( GL_NORMALIZE );
+	int msec = glutGet( GLUT_ELAPSED_TIME )  %  MS_PER_CYCLE;
+
+	//turn that into a time in seconds:
+    float nowTime = (float)msec  / 1000.0f;
+
 
 	// draw the box object by calling up its display list:
 
 	Pattern.Use( );
 
-	// set the uniform variables that will change over time:
-
-	float twist=0.5;
 	
 
-	Pattern.SetUniformVariable( "uTwist", twist );
+	Pattern.SetUniformVariable( "uTwist", NowTwist.GetValue(nowTime));;
 	glCallList(HorseList);
 
 	Pattern.UnUse( );       // Pattern.Use(0);  also works
@@ -700,6 +703,17 @@ InitGraphics( )
 
 	glutIdleFunc( Animate );
 
+	NowTwist.Init( );
+        NowTwist.AddTimeValue(  0.0, -0.08);
+        NowTwist.AddTimeValue(  10.0,  0.01);
+        NowTwist.AddTimeValue(  15.0,  0.05);
+        NowTwist.AddTimeValue(  20.0,  0.08);
+		 NowTwist.AddTimeValue(  25.0,0.01);
+
+
+	
+	
+	
 	HorseList=glGenLists( 1 );
 	glNewList(HorseList,GL_COMPILE);
 	glPushMatrix();
